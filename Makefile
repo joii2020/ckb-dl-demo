@@ -19,6 +19,7 @@ all: \
 	build/ckb_dl_demo_tx
 
 build/dl_interface: dl_interface.c
+	mkdir -p build
 	$(CC) $(CFLAGS) -fPIC -c -o build/dl_interface.o dl_interface.c
 	$(LD) --shared --gc-sections --dynamic-list dl_interface.syms -o $@ build/dl_interface.o
 	cp $@ $@.debug
