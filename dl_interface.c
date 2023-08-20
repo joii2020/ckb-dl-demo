@@ -6,7 +6,7 @@
 
 
 __attribute__((visibility("default")))  int inc_add(int a, int b) {
-  printf("---- inc_add ----");
+  printf("-- inc_add ----");
 
   return a + b;
 }

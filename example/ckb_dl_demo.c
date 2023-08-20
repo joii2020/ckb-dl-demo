@@ -38,42 +38,43 @@ int get_dl_interface_code_hash(uint8_t *code_hash) {
     return CKB_SUCCESS;
 }
 
-static uint8_t g_code_buff[300 * 1024] __attribute__((aligned(RISCV_PGSIZE)));
+static uint8_t g_code_buff[1024 * 1024] __attribute__((aligned(RISCV_PGSIZE)));
 typedef int (*ckb_dl_add)(int a, int b);
 
 int main() {
-    printf("-- main --");
+    printf("- main -");
 
     uint8_t code_hash[32];
     int err = get_dl_interface_code_hash(code_hash);
     if (err != CKB_SUCCESS) {
-        printf("-- get dl_interface code_hash failed: %d", err);
+        printf("Error: get dl_interface code_hash failed: %d", err);
         return err;
     }
 
-    printf("---- begin open dl");
+    printf("- ckb_dlopen2, g_code_buff base ptr: 0x%x", g_code_buff);
     void *handle = NULL;
     size_t consumed_size = 0;
     err = ckb_dlopen2(code_hash, 2, g_code_buff, sizeof(g_code_buff), &handle,
                       &consumed_size);
     if (err != 0) {
-        printf("-- ckb_dlopen2 failed, des: %d", err);
+        printf("Error: ckb_dlopen2 failed, des: %d", err);
 
         return err;
     }
 
-    printf("---- dlsym");
+    printf("- ckb_dlsym");
     ckb_dl_add func = (ckb_dl_add)ckb_dlsym(handle, "inc_add");
     if (func == 0) {
-        printf("-- ckb_dlsym get inc_add failed");
+        printf("Error: ckb_dlsym get inc_add failed");
         return CKB_INVALID_DATA;
     }
-    printf("---- run inc_add, func: 0x%x", func);
+
     int c = func(123, 456);
     if (c != 123 + 456) {
-        printf("-- inc_add return failed");
+        printf("Error: inc_add return failed");
         return 1;
     }
 
+    printf("- exit -");
     return 0;
 }
